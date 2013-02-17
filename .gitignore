@@ -1,0 +1,10 @@
+/Debug
+/Release
+
+/Server/Debug
+
+/Server/Release
+
+/*.sdf
+
+/Server/*.aps

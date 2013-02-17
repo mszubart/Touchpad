@@ -1,4 +1,5 @@
 #include "Socket.h"
+#include "NetIfaceHelpers.h"
 
 namespace ts
 {
@@ -40,13 +41,14 @@ namespace ts
 		AddressToString(buffer, *this, port);
 		return buffer;
 	}
-
+#define LOOPBACK_ADDR "127.0.0.1"
 	Address Address::LocalHost(short port)
 	{
 		char name[256];
-		if(gethostname(name, 256) == SOCKET_ERROR)
-			throw socket_exception("gethostname");
-		hostent* host = gethostbyname(name);    
+		
+		getHostNameByMagic(name, 256);
+
+		hostent* host = gethostbyname(name);
 		if(!host)
 			throw socket_exception("gethostbyname");
 
