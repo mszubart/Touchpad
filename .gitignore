@@ -8,3 +8,7 @@
 /*.sdf
 
 /Server/*.aps
+
+/Touchpad/bin
+
+/Touchpad/gen

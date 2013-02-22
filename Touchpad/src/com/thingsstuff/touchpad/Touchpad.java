@@ -79,7 +79,8 @@ public class Touchpad extends Activity {
 
 	// Context (server) menu.
 	static final private int FAVORITES_ID = CANCEL_ID + 1;
-	static final private int FIND_SERVERS_ID = FAVORITES_ID + 1;
+	static final private int SERVER_DEFAULT_ID = FAVORITES_ID + 1;
+	static final private int FIND_SERVERS_ID = SERVER_DEFAULT_ID + 1;
 	static final private int SERVER_CUSTOM_ID = FIND_SERVERS_ID + 1;
 	static final private int SERVER_FOUND_ID = Menu.FIRST;
 	static final private int SERVER_FAVORITE_ID = Menu.FIRST + 1;
@@ -90,6 +91,7 @@ public class Touchpad extends Activity {
 
 	// Current preferences.
 	protected short Port;
+	protected String DefaultServer; 
 	protected float Sensitivity;
 	protected int MultitouchMode;
 	protected int Timeout;
@@ -246,6 +248,7 @@ public class Touchpad extends Activity {
 		String to = preferences.getString("Server", null);
 		if (to == null)
 			touchpad.setImageResource(R.drawable.background_bad);
+		
 	}
 	@Override
 	protected void onResume() {
@@ -254,6 +257,7 @@ public class Touchpad extends Activity {
 		// Restore settings.
 		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
 
+		DefaultServer = preferences.getString("DefaultServer", "192.168.0.5");
 		try { Port = (short) Integer.parseInt(preferences.getString("Port", Integer.toString(DefaultPort))); } catch(NumberFormatException ex) { Port = DefaultPort; }
 		Sensitivity = (float) preferences.getInt("Sensitivity", 50) / 25.0f + 0.1f;
 		try { MultitouchMode = Integer.parseInt(preferences.getString("MultitouchMode", "0")); } catch(NumberFormatException ex) { MultitouchMode = 0; }
@@ -261,7 +265,7 @@ public class Touchpad extends Activity {
 		EnableScrollBar = preferences.getBoolean("EnableScrollBar", preferences.getBoolean("EnableScroll", true));
 		ScrollBarWidth = preferences.getInt("ScrollBarWidth", 20);
 		EnableSystem = preferences.getBoolean("EnableSystem", true);
-
+		
 		boolean EnableMouseButtons = preferences.getBoolean("EnableMouseButtons", false);
 		boolean EnableModifiers = preferences.getBoolean("EnableModifiers", false);
 		int Toolbar = 0;
@@ -284,6 +288,10 @@ public class Touchpad extends Activity {
 		else browser.setVisibility(View.GONE);
 		
 		timer.postDelayed(mKeepAliveListener, KeepAlive);
+		
+		if(!isConnected()){
+			connect(DefaultServer, 0);
+		}
 	}
 	@Override
 	protected void onPause() {
@@ -734,9 +742,10 @@ public class Touchpad extends Activity {
 		menu.setHeaderTitle(R.string.servers);
 
 		//menu.addSubMenu(0, FAVORITES_ID, 0, R.string.favoriteservers).setHeaderTitle(R.string.servers);
-		menu.addSubMenu(0, FIND_SERVERS_ID, 1, R.string.findservers).setHeaderTitle(R.string.servers);
-		menu.add(0, SERVER_CUSTOM_ID, 2, R.string.customserver).setShortcut('1', 'c');
-		menu.add(0, CANCEL_ID, 3, R.string.cancel).setShortcut('2', 'x');
+		menu.add(0, SERVER_DEFAULT_ID, 1, R.string.default_server).setShortcut('1', 'd');
+		menu.addSubMenu(0, FIND_SERVERS_ID, 2, R.string.findservers).setHeaderTitle(R.string.servers);
+		menu.add(0, SERVER_CUSTOM_ID, 3, R.string.customserver).setShortcut('1', 'c');
+		menu.add(0, CANCEL_ID, 4, R.string.cancel).setShortcut('2', 'x');
 	}
 	@Override
 	public boolean onContextItemSelected(MenuItem item) {
@@ -744,7 +753,11 @@ public class Touchpad extends Activity {
 			// Connect to menu item server.
 			connect(item.getTitle().toString(), 0);
 			return true;
-		} else if (item.getGroupId() == SERVER_FAVORITE_ID) {
+		}else if (item.getItemId() == SERVER_DEFAULT_ID) {
+			// Connect to menu item server.
+			connect(DefaultServer, 0);
+			return true;
+		}else if (item.getGroupId() == SERVER_FAVORITE_ID) {
 			// Connect to menu item server.
 			int slot = item.getItemId();
 			
@@ -763,7 +776,7 @@ public class Touchpad extends Activity {
 
 			final EditText to = new EditText(this);
 			to.setInputType(InputType.TYPE_TEXT_VARIATION_WEB_EDIT_TEXT);
-
+			to.setText(DefaultServer);
 			alert.setTitle(R.string.customserver_title);
 			alert.setMessage(R.string.customserver_message);
 			alert.setView(to);

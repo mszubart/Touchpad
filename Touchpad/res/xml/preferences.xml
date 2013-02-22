@@ -75,7 +75,7 @@
 	<PreferenceCategory 
 		android:title="@string/server">
 		
-    	<EditTextPreference 
+    	<EditTextPreference android:key="DefaultServer" android:title="@string/default_server" android:dialogTitle="@string/default_server" android:summary="@string/default_server_summary" android:defaultValue="192.168.0.5" android:persistent="true"/><EditTextPreference 
     		android:key="Port"
     		android:numeric="integer"
     		android:defaultValue="2999"
@@ -93,5 +93,6 @@
 	    	android:summary="@string/timeout_summary"
 	    	android:text=" ms"
     		android:dialogTitle="@string/timeout" />
+    	
     </PreferenceCategory>    	
 </PreferenceScreen>

@@ -136,6 +136,8 @@
     <string name="timeout_summary">Timeout period for server searches and connection attempts.</string>
     
     <string name="favorites">Favorites</string>
+    <string name="default_server">Default Server</string>
+    <string name="default_server_summary">... to connect to on startup</string>
     
 </resources>
 
